@@ -78,7 +78,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                 trailing: const Icon(Icons.notifications_active_sharp),
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ...LocalizationService.supportedLocales
                       .map((e) => GestureDetector(
