@@ -46,7 +46,7 @@ dependencies:
   cron: ^0.4.0
   android_alarm_manager_plus: ^2.0.5
   flag: ^6.0.0
-
+  sqflite:
 dev_dependencies:
   flutter_test:
     sdk: flutter

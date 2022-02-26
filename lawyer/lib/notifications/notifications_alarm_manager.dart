@@ -19,9 +19,6 @@ void setAndroidAlarm(SharedPreferences prefs) async {
         int.parse(notificationTime.substring(0, 2)),
         int.parse(notificationTime.substring(3, 5)));
   }
-  // print('****************');
-  // print(calculateWhenToStart(notificationTime ?? defaultTime));
-  // print('****************');
 
   await AndroidAlarmManager.initialize();
   await AndroidAlarmManager.cancel(0);

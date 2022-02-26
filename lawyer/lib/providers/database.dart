@@ -1,9 +1,9 @@
 import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:drift/drift.dart';
 import 'dart:io';
 import '../models/cases.dart';
+import 'package:sqflite/sqflite.dart';
 part 'database.g.dart';
 
 LazyDatabase _openConnection() {
@@ -11,8 +11,10 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     // put the database file, called db.sqlite here, into the documents folder
     // for your app.
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'db.sqlite'));
+
+    final dbFolder = await getDatabasesPath();
+
+    final file = File(p.join(dbFolder, 'db.sqlite'));
     return NativeDatabase(file);
   });
 }
