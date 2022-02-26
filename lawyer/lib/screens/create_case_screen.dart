@@ -44,7 +44,7 @@ class _CreateCaseScreenState extends State<CreateCaseScreen> {
       bottomNavigationBar: _buildBottomAppBar(),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: _buildInputForm(),
         ),
       ),
@@ -70,7 +70,7 @@ class _CreateCaseScreenState extends State<CreateCaseScreen> {
   Row _buildAttachmentDateAndDeadline() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         ..._buildAttachmentDateLabelAndPicker(),
         _buildDeadlineInputField(),
@@ -113,9 +113,9 @@ class _CreateCaseScreenState extends State<CreateCaseScreen> {
         validator: _deadlineValidator,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-            //AA labelText: localizations.deaddaline, hintText: localizations.numberOfDays, errorMaxLines: 3),
             labelText: localizations.deadline,
             hintText: localizations.numberOfDays,
+            hintMaxLines: 2,
             errorMaxLines: 3),
         keyboardType: TextInputType.number,
         inputFormatters: <TextInputFormatter>[

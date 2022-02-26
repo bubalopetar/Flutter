@@ -10,8 +10,15 @@ class CustomTheme with ChangeNotifier {
     try to read if lightMode saved in prefs, if getBool('lightMode') returns null or false
     then ThemeMode.light will be default
     */
-    currentMode =
-        prefs?.getBool('lightMode') ?? true ? ThemeMode.light : ThemeMode.dark;
+    var brightness = WidgetsBinding.instance!.window.platformBrightness;
+    if (prefs!.containsKey('lightMode') == false) {
+      currentMode =
+          brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
+    } else {
+      currentMode = prefs?.getBool('lightMode') ?? true
+          ? ThemeMode.light
+          : ThemeMode.dark;
+    }
   }
 
   void changeTheme() async {

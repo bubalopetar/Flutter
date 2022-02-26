@@ -77,22 +77,26 @@ class _CasesListScreenState extends State<CasesListScreen> {
                 title: Text(localizations.changeNotificationsTime),
                 trailing: const Icon(Icons.notifications_active_sharp),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ...LocalizationService.supportedLocales
-                      .map((e) => GestureDetector(
-                            onTap: () => Provider.of<LocalizationService>(
-                                    context,
-                                    listen: false)
-                                .changeActiveLocalization(
-                                    e.languageCode, e.countryCode!),
-                            child: Flag.fromString(e.countryCode!,
-                                height: 20, width: 40),
-                          ))
-                      .toList()
-                ],
+              const Divider(),
+              ListTile(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ...LocalizationService.supportedLocales
+                        .map((e) => GestureDetector(
+                              onTap: () => Provider.of<LocalizationService>(
+                                      context,
+                                      listen: false)
+                                  .changeActiveLocalization(
+                                      e.languageCode, e.countryCode!),
+                              child: Flag.fromString(e.countryCode!,
+                                  height: 20, width: 40),
+                            ))
+                        .toList()
+                  ],
+                ),
               ),
+              const Divider(),
             ],
           ),
         ),

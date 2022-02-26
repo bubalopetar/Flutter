@@ -10,7 +10,7 @@
     "internalNumber":"Internal number",
     "delete": "Delete",
     "deadline": "Deadline",
-    "numberOfDays": "number of days",
+    "numberOfDays": "in days",
     "mustNotBeEmpty": "This field must not be empty",
     "wrongInput": "Wrong input",
     "deadlinePassed": "Deadline has passed",
