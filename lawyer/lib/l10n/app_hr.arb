@@ -35,6 +35,9 @@
     "days":"dana",
     "hour":"sat",
     "hours":"sati",
-    "and":"i"
+    "and":"i",
+    "addNewItem":"Dodaj novi unos",
+    "currentNotificationTime":"Trenutno vrijeme obavijesti"
+
 
 }

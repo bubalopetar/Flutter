@@ -35,5 +35,8 @@
     "days":"days",
     "hour":"hour",
     "hours":"hours",
-    "and":"and"
+    "and":"and",
+    "addNewItem":"Add new item",
+    "currentNotificationTime":"Current notification time"
+    
 }   

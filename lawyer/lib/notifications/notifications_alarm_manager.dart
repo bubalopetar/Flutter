@@ -18,6 +18,8 @@ void setAndroidAlarm(SharedPreferences prefs) async {
         today.day,
         int.parse(notificationTime.substring(0, 2)),
         int.parse(notificationTime.substring(3, 5)));
+  } else {
+    prefs.setString('notificationTime', '0${defaultTime.hour}:00');
   }
 
   await AndroidAlarmManager.initialize();
