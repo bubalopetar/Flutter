@@ -4,7 +4,9 @@ import '../providers/database.dart';
 import '../screens/create_case_screen.dart';
 import '../providers/case_helper.dart';
 
-class CaseCard extends StatelessWidget {
+enum DismissAction { archive, delete }
+
+class CaseCard extends StatefulWidget {
   const CaseCard({
     Key? key,
     required this.caseItem,
@@ -20,15 +22,21 @@ class CaseCard extends StatelessWidget {
     DeadlineStatus.notYetStarted: Colors.lightBlueAccent,
   };
 
+  @override
+  State<CaseCard> createState() => _CaseCardState();
+}
+
+class _CaseCardState extends State<CaseCard> {
+  DismissAction action = DismissAction.delete;
   Future<bool?> _confirmDismiss(direction, context, caseDao) {
     if (direction == DismissDirection.startToEnd) {
       return _showConfirmationDialog(
           context,
-          caseItem,
-          'Jeste li sigurni da želite ${caseItem.isArchived ? 'vratiti arhivirani' : 'arhivirati'} predmet?',
+          widget.caseItem,
+          'Jeste li sigurni da želite ${widget.caseItem.isArchived ? 'vratiti arhivirani' : 'arhivirati'} predmet?',
           caseDao.toggleCaseArchive);
     } else {
-      return _showConfirmationDialog(context, caseItem,
+      return _showConfirmationDialog(context, widget.caseItem,
           'Jeste li sigurni da želite izbrisati predmet?', caseDao.deleteCase);
     }
   }
@@ -53,35 +61,40 @@ class CaseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var caseDao = Provider.of<CaseDao>(context, listen: false);
     return Dismissible(
+      onUpdate: (DismissUpdateDetails details) {
+        if (details.direction == DismissDirection.endToStart) {
+          setState(() {
+            action = DismissAction.delete;
+          });
+        } else {
+          setState(() {
+            action = DismissAction.archive;
+          });
+        }
+      },
       confirmDismiss: (direction) =>
           _confirmDismiss(direction, context, caseDao),
       onDismissed: (direction) {
         if (direction == DismissDirection.endToStart) {
-          caseDao.deleteCase(caseItem);
+          caseDao.deleteCase(widget.caseItem);
         }
         if (direction == DismissDirection.startToEnd) {
-          caseDao.toggleCaseArchive(caseItem);
+          caseDao.toggleCaseArchive(widget.caseItem);
         }
       },
-      background: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: _buildArchiveAndDeleteDismissable,
-        ),
-      ),
-      key: ValueKey(caseItem.id),
+      background: _buildArchiveAndDeleteDismissable(action),
+      key: ValueKey(widget.caseItem.id),
       child: _buildExpansionTile(context),
     );
   }
 
   ExpansionTile _buildExpansionTile(BuildContext context) {
-    var status = caseItem.getDeadlineStatus();
+    var status = widget.caseItem.getDeadlineStatus();
     return ExpansionTile(
       key: UniqueKey(),
       collapsedBackgroundColor: status == DeadlineStatus.multipleDays
           ? Theme.of(context).cardTheme.color
-          : _getColor[status],
+          : CaseCard._getColor[status],
       childrenPadding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
       tilePadding: const EdgeInsets.only(
         left: 10,
@@ -95,7 +108,8 @@ class CaseCard extends StatelessWidget {
 
   Text _buildExpansionTileSubtitle(BuildContext context) {
     return Text(
-        caseItem.getSubtitleText(status: deadlineStatus, context: context),
+        widget.caseItem
+            .getSubtitleText(status: widget.deadlineStatus, context: context),
         style: Theme.of(context).textTheme.headline6);
   }
 
@@ -109,7 +123,7 @@ class CaseCard extends StatelessWidget {
             padding: EdgeInsets.only(right: 8.0),
             child: FittedBox(child: Text('Poslovni br.')),
           ),
-          Text(caseItem.businessNumber,
+          Text(widget.caseItem.businessNumber,
               style: Theme.of(context).textTheme.headline6),
         ],
       ),
@@ -122,11 +136,11 @@ class CaseCard extends StatelessWidget {
             child: Text('Interni br.'),
           ),
           FittedBox(
-              child: Text(caseItem.internalNumber,
+              child: Text(widget.caseItem.internalNumber,
                   style: Theme.of(context).textTheme.headline6)),
         ],
       ),
-      if (caseItem.description.isNotEmpty)
+      if (widget.caseItem.description.isNotEmpty)
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: ConstrainedBox(
@@ -135,7 +149,7 @@ class CaseCard extends StatelessWidget {
               width: double.infinity,
               child: SingleChildScrollView(
                   child: Text(
-                caseItem.description,
+                widget.caseItem.description,
                 style: TextStyle(
                     fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize),
               )),
@@ -156,14 +170,14 @@ class CaseCard extends StatelessWidget {
         ),
         FittedBox(
           child: Text(
-            caseItem.client,
+            widget.caseItem.client,
             style: Theme.of(context).textTheme.headline5,
           ),
         ),
         IconButton(
           onPressed: () {
-            Navigator.of(context)
-                .pushNamed(CreateCaseScreen.screenName, arguments: caseItem);
+            Navigator.of(context).pushNamed(CreateCaseScreen.screenName,
+                arguments: widget.caseItem);
           },
           icon: const Icon(Icons.edit),
         )
@@ -171,26 +185,38 @@ class CaseCard extends StatelessWidget {
     );
   }
 
-  List<Widget> get _buildArchiveAndDeleteDismissable {
-    return [
-      Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Text(caseItem.isArchived ? 'Vrati iz arhive' : 'Arhiviraj'),
-          ),
-          const Icon(Icons.archive)
-        ],
-      ),
-      Row(
-        children: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8.0),
-            child: Text('Izbriši'),
-          ),
-          Icon(Icons.delete)
-        ],
-      ),
-    ];
+  Container _buildArchiveAndDeleteDismissable(DismissAction action) {
+    if (action == DismissAction.archive) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        color: Colors.lightBlue,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Text(
+                  widget.caseItem.isArchived ? 'Vrati iz arhive' : 'Arhiviraj'),
+            ),
+            const Icon(Icons.archive)
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        color: Colors.red,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: const [
+            Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: Text('Izbriši'),
+            ),
+            Icon(Icons.delete)
+          ],
+        ),
+      );
+    }
   }
 }
